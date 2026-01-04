@@ -1,14 +1,17 @@
 import streamlit as st
-# --- 상단 메뉴바와 GitHub 아이콘 숨기기 ---
+
+# [중요] 페이지 기본 설정은 무조건 맨 위에 있어야 합니다!
+st.set_page_config(page_title="토지개발수지분석", layout="wide")
+
+# --- 상단 메뉴바와 GitHub 아이콘 숨기기 (괄호 수정 완료) ---
 st.markdown("""
     <style>
     .stAppDeployButton {display:none;}
-    #MainMenu {visibility: hidden;}
-    header {visibility: hidden;}
+    [data-testid="stToolbar"] {visibility: hidden !important;}
+    header {visibility: hidden !important;}
+    footer {visibility: hidden !important;}
     </style>
-    """, unsafe_allow_html=True
-# 페이지 기본 설정
-st.set_page_config(page_title="토지개발수지분석", layout="wide")
+    """, unsafe_allow_html=True)
 
 # 1. 비밀번호 확인 함수
 def check_password():
