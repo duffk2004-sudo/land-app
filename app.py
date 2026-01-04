@@ -7,7 +7,7 @@ import altair as alt
 # -----------------------------------------------------------------------------
 st.set_page_config(page_title="토지개발 수지분석(Final)", layout="wide")
 
-# 스타일: 메뉴 숨김 + 탭 글씨 크기 조정 + 표 헤더 강조
+# 스타일 설정: 메뉴 숨김, 탭 글씨 크기 확대, 에러 방지
 st.markdown("""
     <style>
     .stAppDeployButton {display:none;}
@@ -15,9 +15,9 @@ st.markdown("""
     header {visibility: hidden !important;}
     footer {visibility: hidden !important;}
     
-    /* 탭 글씨 크게 */
+    /* 탭 글씨 시인성 높이기 */
     button[data-baseweb="tab"] {
-        font-size: 18px !important;
+        font-size: 16px !important;
         font-weight: bold !important;
     }
     </style>
@@ -72,7 +72,7 @@ if check_password():
             with c2:
                 broker_rate_buy = st.number_input("매입 중개수수료(%)", value=0.9, step=0.1)
             
-            # 계산
+            # 계산 변수 정의
             cost_land_pure = land_area_py * land_price_per_py
             cost_acq_tax = cost_land_pure * (acq_tax_rate / 100)
             cost_broker_buy = cost_land_pure * (broker_rate_buy / 100)
@@ -115,7 +115,7 @@ if check_password():
             cost_arch_total = bldg_area_py * cost_per_py_arch
             cost_civil_total = land_area_py * cost_per_py_civil
 
-        # 4. 준공 후 비용 (개발부담금 포함)
+        # 4. 준공 후 비용 (문제의 원인이었던 변수 확실히 정의)
         with st.expander("4. 준공 후 세금 및 개발부담금", expanded=True):
             const_tax_rate = st.number_input("보존등기 세율(%)", value=3.16, step=0.01)
             cost_const_tax = cost_arch_total * (const_tax_rate / 100)
@@ -136,4 +136,144 @@ if check_password():
             dev_charge_calc = dev_profit * 0.25 if dev_profit > 0 else 0
             dev_charge = st.number_input("개발부담금 납부액", value=int(dev_charge_calc), step=100)
             
-            cost_add
+            # [중요] 아까 에러났던 변수 여기 있습니다!
+            cost_add_const = st.number_input("기타 준공비용 (만원)", value=0, step=100)
+            
+        # 5. 양도 및 기타
+        with st.expander("5. 양도(분양) 및 수익분석", expanded=True):
+            sales_price_per_py = st.number_input("평당 분양가 (만원)", value=1500, step=100)
+            total_sales = bldg_area_py * sales_price_per_py
+            
+            broker_rate_sell = st.number_input("분양 수수료(%)", value=0.9, step=0.1)
+            cost_broker_sell = total_sales * (broker_rate_sell / 100)
+            
+            cost_capital_tax = st.number_input("양도세(법인세) 입력 (만원)", value=5000, step=100)
+            cost_other = st.number_input("예비비 (만원)", value=1000, step=100)
+
+    # =========================================================================
+    # [우측] 결과 분석 대시보드 (탭 방식 적용)
+    # =========================================================================
+    
+    # 총계 계산 (모든 변수가 위에서 정의되었는지 확인 필수)
+    grand_total_cost = (cost_land_pure + cost_acq_tax + cost_broker_buy + 
+                        design_arch + design_civil + ag_charge + forest_charge +
+                        cost_arch_total + cost_civil_total + cost_const_tax +
+                        cost_change_tax + dev_charge + cost_add_const +
+                        cost_broker_sell + cost_other + cost_capital_tax)
+    
+    net_profit = total_sales - grand_total_cost
+    roi = (net_profit / grand_total_cost * 100) if grand_total_cost > 0 else 0
+
+    with col_result:
+        st.header("📊 수지분석 리포트")
+        
+        # 상단 요약 배너
+        m1, m2, m3 = st.columns(3)
+        m1.metric("총 매출 (수입)", f"{total_sales:,.0f} 만원")
+        m2.metric("총 지출 (비용)", f"{grand_total_cost:,.0f} 만원")
+        m3.metric("예상 순수익", f"{net_profit:,.0f} 만원", f"{roi:.2f}%", delta_color="normal")
+        
+        st.write("") # 간격 띄우기
+
+        # --------------------------------------------------------
+        # 탭(Tab) 만들기: 표와 그래프 분리
+        # --------------------------------------------------------
+        tab_table, tab_graph = st.tabs(["📋 상세 지출 내역표", "📊 시각화 그래프"])
+
+        # [탭 1] 상세 지출 내역표
+        with tab_table:
+            st.markdown("##### 📌 지출 항목별 상세 내역 (단위: 만원)")
+            
+            # 데이터프레임 만들기 (대분류 - 소분류 - 금액)
+            data = [
+                ["1. 토지매입비", "순수 토지비", cost_land_pure],
+                ["1. 토지매입비", "토지 취등록세", cost_acq_tax],
+                ["1. 토지매입비", "매입 중개수수료", cost_broker_buy],
+                
+                ["2. 인허가/부담금", "건축 설계비", design_arch],
+                ["2. 인허가/부담금", "토목 설계비", design_civil],
+                ["2. 인허가/부담금", "농지전용부담금", ag_charge],
+                ["2. 인허가/부담금", "대체산림조성비", forest_charge],
+                
+                ["3. 공사비", "건축 공사비", cost_arch_total],
+                ["3. 공사비", "토목 공사비", cost_civil_total],
+                
+                ["4. 준공후 비용", "보존등기 취득세", cost_const_tax],
+                ["4. 준공후 비용", "지목변경 취득세", cost_change_tax],
+                ["4. 준공후 비용", "개발부담금", dev_charge],
+                ["4. 준공후 비용", "기타 준공비용", cost_add_const],
+                
+                ["5. 판매/세금", "분양 중개수수료", cost_broker_sell],
+                ["5. 판매/세금", "양도세(법인세)", cost_capital_tax],
+                ["5. 판매/세금", "기타 예비비", cost_other],
+            ]
+            
+            df_detail = pd.DataFrame(data, columns=["대항목", "세부항목", "금액"])
+            
+            # 표 보여주기
+            st.dataframe(
+                df_detail.style.format({"금액": "{:,.0f}"}),
+                use_container_width=True,
+                height=600,
+                hide_index=True
+            )
+
+        # [탭 2] 그래프
+        with tab_graph:
+            st.markdown("##### 📈 수입 vs 지출 구조 분석")
+            
+            # 1. 전체 구조 그래프
+            chart_data = pd.DataFrame({
+                '항목': ['총 매출', '총 지출', '순수익'],
+                '금액': [total_sales, grand_total_cost, net_profit],
+                '색상': ['#1f77b4', '#d62728', '#2ca02c']
+            })
+            
+            base = alt.Chart(chart_data).encode(
+                x=alt.X('금액', axis=None), # 가로형 막대
+                y=alt.Y('항목', sort=None, title=""),
+                color=alt.Color('색상', scale=None, legend=None),
+                tooltip=['항목', alt.Tooltip('금액', format=',.0f')]
+            )
+            
+            bar = base.mark_bar(size=40)
+            text = base.mark_text(
+                align='left',
+                dx=5,
+                fontSize=14,
+                fontWeight='bold'
+            ).encode(
+                text=alt.Text('금액', format=',.0f')
+            )
+            
+            st.altair_chart(bar + text, use_container_width=True)
+            
+            st.divider()
+            
+            # 2. 지출 비중 파이차트
+            st.markdown("##### 🍩 지출 비중 분석")
+            
+            cost_data = pd.DataFrame({
+                'category': ['토지비', '인허가/부담금', '공사비', '준공후세금', '판매/양도세'],
+                'value': [
+                    cost_land_pure + cost_acq_tax + cost_broker_buy,
+                    design_arch + design_civil + ag_charge + forest_charge,
+                    cost_arch_total + cost_civil_total,
+                    cost_const_tax + cost_change_tax + dev_charge + cost_add_const,
+                    cost_broker_sell + cost_capital_tax + cost_other
+                ]
+            })
+            
+            pie = alt.Chart(cost_data).mark_arc(innerRadius=50).encode(
+                theta=alt.Theta(field="value", type="quantitative"),
+                color=alt.Color(field="category", type="nominal", title="지출 항목"),
+                tooltip=['category', alt.Tooltip('value', format=',.0f')]
+            )
+            st.altair_chart(pie, use_container_width=True)
+
+        # 최종 판정
+        st.write("")
+        if net_profit > 0:
+            st.success(f"✅ **사업성 성공!** 예상 수익금은 **{net_profit:,.0f} 만원** 입니다.")
+        else:
+            st.error(f"⚠️ **사업성 주의!** **{abs(net_profit):,.0f} 만원**의 적자가 예상됩니다.")
