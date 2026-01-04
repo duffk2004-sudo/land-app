@@ -1,24 +1,3 @@
-사장님, 정확한 지적입니다. 분양(매각) 금액을 산정할 때 '건물 평수'로 팔 수도 있고, '토지 평수'로 팔 수도 있어야 진정한 전문가용이죠.
-
-말씀하신 대로 두 가지 기능을 완벽하게 수정했습니다.
-
-분양가 기준 선택 기능 추가:
-
-"건물 평수 기준" vs **"토지 평수 기준"**을 선택할 수 있게 만들었습니다.
-
-선택에 따라 총 매출액이 정확하게 바뀝니다.
-
-그래프 디자인 개선:
-
-막대그래프의 폭을 좁혀서(Slim) 훨씬 세련되게 만들었습니다.
-
-금액 숫자가 막대 끝에 정확하게 정렬되도록 위치를 조정했습니다.
-
-아래 코드를 복사해서 덮어씌우시면 됩니다.
-
-🔥 [최종] 분양기준 선택 + 그래프 디자인 수정 코드
-Python
-
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -159,9 +138,9 @@ if check_password():
             
             cost_add_const = st.number_input("기타 추가건축비 (만원)", value=0, step=100)
             
-        # 5. 양도 및 수익분석 (기준 선택 기능 추가)
+        # 5. 양도 및 수익분석
         with st.expander("5. 양도/이자 및 수익분석", expanded=True):
-            # [수정] 분양가 산정 기준 선택
+            # 분양가 산정 기준 선택
             st.markdown("##### 📌 분양(매각) 기준 선택")
             sales_criteria = st.radio(
                 "어떤 면적을 기준으로 파시겠습니까?",
@@ -171,7 +150,7 @@ if check_password():
             
             sales_price_per_py = st.number_input("평당 분양가 (만원)", value=1500, step=100)
             
-            # [수정] 선택한 기준에 따라 총 매출 계산
+            # 선택한 기준에 따라 총 매출 계산
             if sales_criteria == "건물 평수 기준 (연면적)":
                 total_sales = bldg_area_py * sales_price_per_py
                 st.caption(f"👉 계산식: 연면적({bldg_area_py}평) × {sales_price_per_py}만원")
@@ -277,7 +256,7 @@ if check_password():
                 hide_index=True
             )
 
-        # [탭 2] 그래프 (디자인 수정 반영)
+        # [탭 2] 그래프
         with tab_graph:
             st.markdown("##### 📈 수입 vs 지출 구조 분석")
             
@@ -294,13 +273,12 @@ if check_password():
                 tooltip=['항목', alt.Tooltip('금액', format=',.0f')]
             )
             
-            # [수정] 막대 굵기를 30으로 줄여서 얇고 세련되게 표현
+            # 막대 굵기(size) 30, 텍스트 정렬 수정 완료
             bar = base.mark_bar(size=30)
             
-            # [수정] 텍스트를 막대 끝(Right)에 정렬
             text = base.mark_text(
-                align='left',   # 왼쪽 정렬 (막대 끝 기준)
-                dx=5,           # 막대에서 5픽셀 떨어뜨림
+                align='left',
+                dx=5,
                 fontSize=14,
                 fontWeight='bold'
             ).encode(
@@ -334,4 +312,4 @@ if check_password():
         if net_profit > 0:
             st.success(f"✅ **사업성 성공!** 예상 수익금은 **{net_profit:,.0f} 만원** 입니다.")
         else:
-            st.error(f"⚠️ **사업성 주의!** **{abs(net_profit):,.0f} 만원**의 적자가 예상됩니다
+            st.error(f"⚠️ **사업성 주의!** **{abs(net_profit):,.0f} 만원**의 적자가 예상됩니다.")
