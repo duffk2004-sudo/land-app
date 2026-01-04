@@ -31,14 +31,14 @@ if check_password():
     st.title("🏢 토지개발 수지분석 시스템")
     st.markdown("---")
 
-    # 안내 메시지 (프린트/공유 관련)
+    # 안내 메시지
     with st.expander("ℹ️ 사용 팁 (저장 및 인쇄)"):
         st.info("""
         - **인쇄/PDF 저장:** 브라우저 메뉴에서 `인쇄(Ctrl + P)`를 누른 뒤 'PDF로 저장'을 선택하시면 깔끔하게 저장됩니다.
         - **주소 공유:** 상단 주소창의 URL을 복사해서 전달하세요. (비밀번호 2580도 함께 알려주셔야 합니다.)
         """)
 
-    # 화면을 좌우로 나누기 (왼쪽: 입력 / 오른쪽: 결과)
+    # 화면을 좌우로 나누기
     col1, col2 = st.columns([1, 1])
 
     with col1:
@@ -50,12 +50,12 @@ if check_password():
         construction_cost = st.number_input("평당 공사비 (만원)", value=800, step=50)
 
     # 계산 로직
-    total_land_cost = land_area * land_price  # 총 토지비
-    total_floor_area = land_area * (floor_area_ratio / 100) # 연면적
-    total_construction_cost = total_floor_area * construction_cost # 총 공사비
-    total_sales = total_floor_area * sales_price # 총 매출액
+    total_land_cost = land_area * land_price
+    total_floor_area = land_area * (floor_area_ratio / 100)
+    total_construction_cost = total_floor_area * construction_cost
+    total_sales = total_floor_area * sales_price
     
-    # 기타 비용 (대략 매출의 10% 가정)
+    # 기타 비용 (매출의 10%)
     other_cost = total_sales * 0.1
     
     # 총 지출 및 수익
@@ -66,7 +66,6 @@ if check_password():
     with col2:
         st.subheader("2. 수지 분석 결과")
         
-        # 보기 좋게 카드 형태로 표시
         st.metric(label="예상 총 매출액", value=f"{total_sales:,.0f} 만원")
         st.metric(label="예상 총 지출", value=f"{total_cost:,.0f} 만원")
         
