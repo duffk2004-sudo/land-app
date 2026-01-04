@@ -18,7 +18,7 @@ def check_password():
         if st.button("로그인"):
             if password == "2580":
                 st.session_state["password_correct"] = True
-                st.rerun()  # 화면을 새로고침해서 내용을 보여줌
+                st.rerun()
             else:
                 st.error("비밀번호가 틀렸습니다. 다시 시도해주세요.")
         return False
@@ -32,10 +32,10 @@ if check_password():
     st.markdown("---")
 
     # 안내 메시지
-    with st.expander("ℹ️ 사용 팁 (저장 및 인쇄)"):
+    with st.expander("ℹ️ 사용 팁"):
         st.info("""
-        - **인쇄/PDF 저장:** 브라우저 메뉴에서 `인쇄(Ctrl + P)`를 누른 뒤 'PDF로 저장'을 선택하시면 깔끔하게 저장됩니다.
-        - **주소 공유:** 상단 주소창의 URL을 복사해서 전달하세요. (비밀번호 2580도 함께 알려주셔야 합니다.)
+        - **인쇄/PDF 저장:** 브라우저 메뉴에서 `인쇄(Ctrl + P)`를 누른 뒤 'PDF로 저장'을 선택하세요.
+        - **공유:** 주소창의 URL을 복사해서 전달하세요. (비밀번호 2580 필수)
         """)
 
     # 화면을 좌우로 나누기
