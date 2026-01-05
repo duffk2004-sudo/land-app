@@ -7,9 +7,10 @@ import altair as alt
 # -----------------------------------------------------------------------------
 st.set_page_config(page_title="토지개발 수지분석(Final)", layout="wide")
 
-# 스타일 설정
+# 스타일 설정: 메뉴 숨김, 탭 글씨 크기 확대, 링크 스타일
 st.markdown("""
     <style>
+    /* 기존 스타일 유지 */
     .stAppDeployButton {display:none;}
     [data-testid="stToolbar"] {visibility: hidden !important;}
     header {visibility: hidden !important;}
@@ -19,6 +20,19 @@ st.markdown("""
     button[data-baseweb="tab"] {
         font-size: 16px !important;
         font-weight: bold !important;
+    }
+    
+    /* 유튜브 링크 스타일 (마우스 올렸을 때 효과) */
+    .youtube-link {
+        text-decoration: none; 
+        color: #FF0000 !important; /* 유튜브 레드 */
+        font-weight: bold; 
+        font-size: 1.1em;
+        transition: all 0.3s ease;
+    }
+    .youtube-link:hover {
+        color: #CC0000 !important; /* 마우스 오버시 약간 진하게 */
+        text-decoration: underline;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -47,7 +61,21 @@ def check_password():
 # 3. 메인 앱 실행
 # -----------------------------------------------------------------------------
 if check_password():
+    # 메인 타이틀
     st.title("🏗️ 토지개발 수지분석 시스템 (전문가용)")
+
+    # =================================================================
+    # [유튜브 링크 적용 완료] 
+    # =================================================================
+    st.markdown("""
+        <div style="text-align: right; margin-top: -15px; margin-bottom: 15px;">
+            <a href="https://youtube.com/channel/UCc_tqEp9QIRFgTRtuWPXqlg" target="_blank" class="youtube-link">
+                ▶️ 김아재의땅따먹기 (유튜브 채널 바로가기)
+            </a>
+        </div>
+    """, unsafe_allow_html=True)
+    # =================================================================
+
     st.markdown("---")
 
     # 전체 레이아웃: 좌측(입력) / 우측(결과)
@@ -273,7 +301,7 @@ if check_password():
                 tooltip=['항목', alt.Tooltip('금액', format=',.0f')]
             )
             
-            # 막대 굵기(size) 30, 텍스트 정렬 수정 완료
+            # 막대 굵기 30
             bar = base.mark_bar(size=30)
             
             text = base.mark_text(
