@@ -5,7 +5,6 @@ import altair as alt
 # -----------------------------------------------------------------------------
 # 1. 페이지 및 스타일 설정
 # -----------------------------------------------------------------------------
-# 레이아웃 설정을 wide로 유지
 st.set_page_config(page_title="토지개발 수지분석(Final)", layout="wide")
 
 # 스타일 설정: 메뉴 숨김, 탭 글씨 크기 확대, 링크 스타일, 애니메이션
@@ -24,9 +23,17 @@ st.markdown("""
     }
     
     /* 유튜브 링크 스타일 */
+    .youtube-link-container {
+        text-align: right; 
+        margin-top: -15px; 
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
     .youtube-link {
         text-decoration: none; 
-        color: black !important; /* 글씨 색상 검은색으로 변경 */
+        color: black !important; /* 글씨 색상 검은색 */
         font-weight: bold; 
         font-size: 1.1em;
         display: inline-flex;
@@ -37,16 +44,16 @@ st.markdown("""
     }
 
     /* 유튜브 아이콘 스타일 및 애니메이션 */
-    .youtube-icon {
-        color: #FF0000; /* 아이콘 색상 빨간색 */
-        margin-right: 5px;
+    .youtube-icon-svg {
+        fill: #FF0000; /* 유튜브 공식 레드 색상 */
+        margin-right: 8px;
         animation: blink 1.5s infinite; /* 깜빡임 애니메이션 적용 */
     }
 
     /* 깜빡임 애니메이션 정의 */
     @keyframes blink {
         0% { opacity: 1; }
-        50% { opacity: 0.5; }
+        50% { opacity: 0.6; }
         100% { opacity: 1; }
     }
     </style>
@@ -80,12 +87,15 @@ if check_password():
     st.title("🏗️ 토지개발 수지분석 시스템 (전문가용)")
 
     # =================================================================
-    # [유튜브 링크 적용 완료 - 디자인 및 애니메이션 수정] 
+    # [유튜브 공식 로고(SVG) 적용 완료] 
     # =================================================================
     st.markdown("""
-        <div style="text-align: right; margin-top: -15px; margin-bottom: 15px;">
+        <div class="youtube-link-container">
             <a href="https://youtube.com/channel/UCc_tqEp9QIRFgTRtuWPXqlg" target="_blank" class="youtube-link">
-                <span class="youtube-icon">▶️</span> 김아재의땅따먹기 (유튜브 채널 바로가기)
+                <svg class="youtube-icon-svg" xmlns="http://www.w3.org/2000/svg" height="24" width="34" viewBox="0 0 576 512">
+                    <path d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 42.276 48.284 48.597 42.72 11.486 213.371 11.486 213.371 11.486s170.78 0 213.371-11.486c23.497-6.322 42.003-24.947 48.284-48.597 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zM232.049 321.878V190.122l109.112 65.878-109.112 65.878z"/>
+                </svg>
+                김아재의땅따먹기 (유튜브 채널 바로가기)
             </a>
         </div>
     """, unsafe_allow_html=True)
