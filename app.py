@@ -5,9 +5,10 @@ import altair as alt
 # -----------------------------------------------------------------------------
 # 1. 페이지 및 스타일 설정
 # -----------------------------------------------------------------------------
+# 레이아웃 설정을 wide로 유지
 st.set_page_config(page_title="토지개발 수지분석(Final)", layout="wide")
 
-# 스타일 설정: 메뉴 숨김, 탭 글씨 크기 확대, 링크 스타일
+# 스타일 설정: 메뉴 숨김, 탭 글씨 크기 확대, 링크 스타일, 애니메이션
 st.markdown("""
     <style>
     /* 기존 스타일 유지 */
@@ -22,17 +23,31 @@ st.markdown("""
         font-weight: bold !important;
     }
     
-    /* 유튜브 링크 스타일 (마우스 올렸을 때 효과) */
+    /* 유튜브 링크 스타일 */
     .youtube-link {
         text-decoration: none; 
-        color: #FF0000 !important; /* 유튜브 레드 */
+        color: black !important; /* 글씨 색상 검은색으로 변경 */
         font-weight: bold; 
         font-size: 1.1em;
-        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
     }
     .youtube-link:hover {
-        color: #CC0000 !important; /* 마우스 오버시 약간 진하게 */
         text-decoration: underline;
+    }
+
+    /* 유튜브 아이콘 스타일 및 애니메이션 */
+    .youtube-icon {
+        color: #FF0000; /* 아이콘 색상 빨간색 */
+        margin-right: 5px;
+        animation: blink 1.5s infinite; /* 깜빡임 애니메이션 적용 */
+    }
+
+    /* 깜빡임 애니메이션 정의 */
+    @keyframes blink {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
     }
     </style>
     """, unsafe_allow_html=True)
@@ -65,12 +80,12 @@ if check_password():
     st.title("🏗️ 토지개발 수지분석 시스템 (전문가용)")
 
     # =================================================================
-    # [유튜브 링크 적용 완료] 
+    # [유튜브 링크 적용 완료 - 디자인 및 애니메이션 수정] 
     # =================================================================
     st.markdown("""
         <div style="text-align: right; margin-top: -15px; margin-bottom: 15px;">
             <a href="https://youtube.com/channel/UCc_tqEp9QIRFgTRtuWPXqlg" target="_blank" class="youtube-link">
-                ▶️ 김아재의땅따먹기 (유튜브 채널 바로가기)
+                <span class="youtube-icon">▶️</span> 김아재의땅따먹기 (유튜브 채널 바로가기)
             </a>
         </div>
     """, unsafe_allow_html=True)
@@ -284,7 +299,7 @@ if check_password():
                 hide_index=True
             )
 
-        # [탭 2] 그래프
+        # [탭 2] 그래프 (디자인 수정 반영 - 막대 두께 통일)
         with tab_graph:
             st.markdown("##### 📈 수입 vs 지출 구조 분석")
             
@@ -301,8 +316,8 @@ if check_password():
                 tooltip=['항목', alt.Tooltip('금액', format=',.0f')]
             )
             
-            # 막대 굵기 30
-            bar = base.mark_bar(size=30)
+            # [수정] 막대 굵기(size)를 제거하여 Altair가 자동으로 균일하게 맞추도록 함
+            bar = base.mark_bar()
             
             text = base.mark_text(
                 align='left',
